@@ -6,6 +6,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
+import { JsonFormatterModule } from './tools/json-formatter/json-formatter.module';
+import { JwtDecoderModule } from './tools/jwt-decoder/jwt-decoder.module';
+import { QrGeneratorModule } from './tools/qr-generator/qr-generator.module';
 
 @Module({
   imports: [
@@ -40,6 +43,12 @@ import { BullModule } from '@nestjs/bull';
 
     // Feature Modules
     AuthModule,
+
+    JsonFormatterModule,
+
+    JwtDecoderModule,
+
+    QrGeneratorModule,
     // ProfileModule,
     // ProjectsModule,
     // BlogModule,

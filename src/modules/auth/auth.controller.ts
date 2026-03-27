@@ -1,5 +1,5 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, HttpCode, HttpStatus, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthResponseDto, RefreshTokenDto, RegisterDto } from './dto/register.dto/register.dto';
 import { JwtAuthGuardGuard } from './guards/jwt-auth/jwt-auth.guard';
@@ -38,10 +38,14 @@ export class AuthController {
     @Post('logout')
     @UseGuards(JwtAuthGuardGuard)
     @HttpCode(HttpStatus.OK)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Logout a user' })
     @ApiResponse({ status: 200, description: 'Logged out successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async logout(@Body() body: RefreshTokenDto) {
-        return this.authService.logout(body.refresh_token);
+    async logout(@Body() refreshTokenDto: RefreshTokenDto) {
+        if (!refreshTokenDto.refresh_token) {
+            throw new UnauthorizedException('Refresh token is required for logout');
+        }
+        return this.authService.logout(refreshTokenDto.refresh_token);
     }
 }

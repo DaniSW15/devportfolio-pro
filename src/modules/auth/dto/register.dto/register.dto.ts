@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsOptional, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
 
 export class RegisterDto {
     @ApiProperty({ example: 'user@example.com' })
@@ -34,7 +34,25 @@ export class LoginDto {
 export class RefreshTokenDto {
     @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
     @IsString()
+    @IsNotEmpty()
     refresh_token!: string;
+}
+
+export class UserResponseDto {
+    @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
+    id!: string;
+
+    @ApiProperty({ example: 'user@example.com' })
+    email!: string;
+
+    @ApiProperty({ example: 'John Doe' })
+    name!: string;
+
+    @ApiProperty({ example: 'https://example.com/avatar.jpg', required: false })
+    avatarUrl?: string;
+
+    @ApiProperty({ example: 'user', enum: ['user', 'admin'] })
+    role!: string;
 }
 
 export class AuthResponseDto {
@@ -44,7 +62,7 @@ export class AuthResponseDto {
     @ApiProperty()
     refresh_token!: string;
 
-    @ApiProperty()
+    @ApiProperty({ type: UserResponseDto })
     user!: {
         id: string;
         email: string;
