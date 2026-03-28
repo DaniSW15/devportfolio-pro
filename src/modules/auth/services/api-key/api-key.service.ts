@@ -1,7 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApiKeyEntity } from '../../entities/api-key/api-key.entity';
+import { CreateApiKeyDto } from '../../dto/api-key-dto/api-key-dto';
 import { UserEntity } from '../../entities/user-entity/user.entity';
 import * as crypto from 'crypto';
 
@@ -12,12 +13,14 @@ export class ApiKeyService {
         private apiKeyRepository: Repository<ApiKeyEntity>,
     ) { }
 
-    async generateApiKey(userId: string, name: string): Promise<{ key: string; apiKey: ApiKeyEntity }> {
+    async generateApiKey(userId: string, dto: CreateApiKeyDto): Promise<{ key: string; apiKey: ApiKeyEntity }> {
+        // Generar API key con prefijo para identificar origen
         const key = `dk_${crypto.randomBytes(32).toString('hex')}`;
 
         const apiKey = this.apiKeyRepository.create({
-            name,
+            name: dto.name,
             key,
+            expiresAt: dto.expiresAt,
             user: { id: userId },
         });
 
@@ -60,9 +63,42 @@ export class ApiKeyService {
             where: { id, user: { id: userId } },
         });
 
-        if (apiKey) {
-            apiKey.isActive = false;
-            await this.apiKeyRepository.save(apiKey);
+        if (!apiKey) {
+            throw new NotFoundException('API key not found');
         }
+
+        apiKey.isActive = false;
+        await this.apiKeyRepository.save(apiKey);
+    }
+
+    async deleteApiKey(id: string, userId: string): Promise<void> {
+        const apiKey = await this.apiKeyRepository.findOne({
+            where: { id, user: { id: userId } },
+        });
+
+        if (!apiKey) {
+            throw new NotFoundException('API key not found');
+        }
+
+        await this.apiKeyRepository.remove(apiKey);
+    }
+
+    async getApiKeyStats(id: string, userId: string): Promise<any> {
+        const apiKey = await this.apiKeyRepository.findOne({
+            where: { id, user: { id: userId } },
+        });
+
+        if (!apiKey) {
+            throw new NotFoundException('API key not found');
+        }
+
+        return {
+            id: apiKey.id,
+            name: apiKey.name,
+            usageCount: apiKey.usageCount,
+            lastUsedAt: apiKey.lastUsedAt,
+            createdAt: apiKey.createdAt,
+            isActive: apiKey.isActive,
+        };
     }
 }

@@ -20,6 +20,7 @@ import { TimestampConverterModule } from './modules/tools/timestamp-converter/ti
 import { RateLimitModule } from './modules/rate-limit/rate-limit.module';
 import { StripeService } from './modules/billing/stripe/stripe.service';
 import { StripeModule } from './modules/billing/stripe/stripe.module';
+import { WebSocketModule } from './modules/websocket/websocket.module';
 
 @Module({
   imports: [
@@ -78,13 +79,8 @@ import { StripeModule } from './modules/billing/stripe/stripe.module';
     RateLimitModule,
 
     StripeModule,
-    // ProfileModule,
-    // ProjectsModule,
-    // BlogModule,
-    // DevtoolsModule,
-    // CommentsModule,
-    // AnalyticsModule,
-    // IntegrationsModule,
+
+    WebSocketModule,
   ],
   controllers: [],
   providers: [PasswordGeneratorService, StripeService],

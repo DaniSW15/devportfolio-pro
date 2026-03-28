@@ -12,6 +12,8 @@ import { TokenBlacklistService } from './services/token-blacklist/token-blacklis
 import { BlacklistedTokenEntity } from './entities/blacklisted-token/blacklisted-token';
 import { ApiKeyService } from './services/api-key/api-key.service';
 import { ApiKeyEntity } from './entities/api-key/api-key.entity';
+import { ApiKeyGuard } from './guards/api-key/api-key.guard';
+import { ApiKeyController } from './controllers/api-key/api-key.controller';
 
 @Module({
     imports: [
@@ -27,8 +29,8 @@ import { ApiKeyEntity } from './entities/api-key/api-key.entity';
             }),
         }),
     ],
-    controllers: [AuthController],
-    providers: [AuthService, JwtStrategyService, JwtStrategyService, TokenBlacklistService, ApiKeyService],
-    exports: [AuthService],
+    controllers: [AuthController, ApiKeyController],
+    providers: [AuthService, JwtStrategyService, TokenBlacklistService, ApiKeyService, ApiKeyGuard],
+    exports: [AuthService, ApiKeyService,  ApiKeyGuard, TokenBlacklistService, JwtStrategyService],
 })
 export class AuthModule { }
