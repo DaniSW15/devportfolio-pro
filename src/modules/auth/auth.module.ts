@@ -10,10 +10,12 @@ import { UserEntity } from './entities/user-entity/user.entity';
 import { ConfigModule } from 'src/config/config.module';
 import { TokenBlacklistService } from './services/token-blacklist/token-blacklist.service';
 import { BlacklistedTokenEntity } from './entities/blacklisted-token/blacklisted-token';
+import { ApiKeyService } from './services/api-key/api-key.service';
+import { ApiKeyEntity } from './entities/api-key/api-key.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([UserEntity, BlacklistedTokenEntity]),
+        TypeOrmModule.forFeature([UserEntity, BlacklistedTokenEntity, ApiKeyEntity]),
         ConfigModule,
         PassportModule,
         JwtModule.registerAsync({
@@ -26,7 +28,7 @@ import { BlacklistedTokenEntity } from './entities/blacklisted-token/blacklisted
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategyService, JwtStrategyService, TokenBlacklistService],
+    providers: [AuthService, JwtStrategyService, JwtStrategyService, TokenBlacklistService, ApiKeyService],
     exports: [AuthService],
 })
 export class AuthModule { }

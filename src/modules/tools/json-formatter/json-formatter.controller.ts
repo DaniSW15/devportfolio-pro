@@ -1,10 +1,13 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { JsonFormatterService } from './json-formatter.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JsonFormatterDto, JsonFormatterResponseDto } from './dto/json-formatter.dto';
+import { JwtAuthGuardGuard } from 'src/modules/auth/guards/jwt-auth/jwt-auth.guard';
+import { RateLimitGuard } from 'src/modules/rate-limit/rate-limit/rate-limit.guard';
 
 @ApiBearerAuth()
 @Controller('json-formatter')
+@UseGuards(JwtAuthGuardGuard, RateLimitGuard)
 export class JsonFormatterController {
     constructor(private readonly jsonFormatterService: JsonFormatterService) { }
 

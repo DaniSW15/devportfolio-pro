@@ -17,6 +17,9 @@ import { ColorPaletteModule } from './modules/tools/color-palette/color-palette.
 import { Base64ToolModule } from './modules/tools/base64-tool/base64-tool.module';
 import { UuidGeneratorModule } from './modules/tools/uuid-generator/uuid-generator.module';
 import { TimestampConverterModule } from './modules/tools/timestamp-converter/timestamp-converter.module';
+import { RateLimitModule } from './modules/rate-limit/rate-limit.module';
+import { StripeService } from './modules/billing/stripe/stripe.service';
+import { StripeModule } from './modules/billing/stripe/stripe.module';
 
 @Module({
   imports: [
@@ -71,6 +74,10 @@ import { TimestampConverterModule } from './modules/tools/timestamp-converter/ti
     UuidGeneratorModule,
 
     TimestampConverterModule,
+
+    RateLimitModule,
+
+    StripeModule,
     // ProfileModule,
     // ProjectsModule,
     // BlogModule,
@@ -80,6 +87,6 @@ import { TimestampConverterModule } from './modules/tools/timestamp-converter/ti
     // IntegrationsModule,
   ],
   controllers: [],
-  providers: [PasswordGeneratorService],
+  providers: [PasswordGeneratorService, StripeService],
 })
 export class AppModule { }
