@@ -6,9 +6,17 @@ import { AuthModule } from './modules/auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
-import { JsonFormatterModule } from './tools/json-formatter/json-formatter.module';
-import { JwtDecoderModule } from './tools/jwt-decoder/jwt-decoder.module';
-import { QrGeneratorModule } from './tools/qr-generator/qr-generator.module';
+import { JsonFormatterModule } from './modules/tools/json-formatter/json-formatter.module';
+import { JwtDecoderModule } from './modules/tools/jwt-decoder/jwt-decoder.module';
+import { QrGeneratorModule } from './modules/tools/qr-generator/qr-generator.module';
+import { PasswordGeneratorService } from './modules/tools/password-generator/password-generator.service';
+import { PasswordGeneratorModule } from './modules/tools/password-generator/password-generator.module';
+import { ApiTesterModule } from './modules/tools/api-tester/api-tester.module';
+import { SnippetManagerModule } from './modules/tools/snippet-manager/snippet-manager.module';
+import { ColorPaletteModule } from './modules/tools/color-palette/color-palette.module';
+import { Base64ToolModule } from './modules/tools/base64-tool/base64-tool.module';
+import { UuidGeneratorModule } from './modules/tools/uuid-generator/uuid-generator.module';
+import { TimestampConverterModule } from './modules/tools/timestamp-converter/timestamp-converter.module';
 
 @Module({
   imports: [
@@ -49,6 +57,20 @@ import { QrGeneratorModule } from './tools/qr-generator/qr-generator.module';
     JwtDecoderModule,
 
     QrGeneratorModule,
+
+    PasswordGeneratorModule,
+
+    ApiTesterModule,
+
+    SnippetManagerModule,
+
+    ColorPaletteModule,
+
+    Base64ToolModule,
+
+    UuidGeneratorModule,
+
+    TimestampConverterModule,
     // ProfileModule,
     // ProjectsModule,
     // BlogModule,
@@ -58,6 +80,6 @@ import { QrGeneratorModule } from './tools/qr-generator/qr-generator.module';
     // IntegrationsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [PasswordGeneratorService],
 })
 export class AppModule { }

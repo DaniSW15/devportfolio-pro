@@ -1,8 +1,9 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { JwtDecoderService } from './jwt-decoder.service';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtDecoderDto, JwtDecodeResponseDto } from './dto/jwt-decoder.dto';
 
+@ApiBearerAuth()
 @Controller('jwt-decoder')
 export class JwtDecoderController {
     constructor(private readonly jwtDecoderService: JwtDecoderService) { }

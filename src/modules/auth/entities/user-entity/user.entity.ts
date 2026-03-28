@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Exclude } from "class-transformer";
 import * as bcrypt from 'bcrypt';
 import { BeforeInsert } from "typeorm";
+import { SnippetEntity } from "src/modules/tools/snippet-manager/entity/snippet.entity";
 
 export enum UserRole {
     USER = 'user',
@@ -72,4 +73,7 @@ export class UserEntity {
     async validatePassword(password: string): Promise<boolean> {
         return bcrypt.compare(password, this.password);
     }
+
+    @OneToMany(() => SnippetEntity, (snippet) => snippet.user)
+    snippets!: SnippetEntity[];
 }

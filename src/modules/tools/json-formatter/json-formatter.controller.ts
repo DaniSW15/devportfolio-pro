@@ -1,8 +1,9 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { JsonFormatterService } from './json-formatter.service';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JsonFormatterDto, JsonFormatterResponseDto } from './dto/json-formatter.dto';
 
+@ApiBearerAuth()
 @Controller('json-formatter')
 export class JsonFormatterController {
     constructor(private readonly jsonFormatterService: JsonFormatterService) { }
