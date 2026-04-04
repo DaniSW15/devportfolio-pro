@@ -17,11 +17,13 @@ import { ApiKeyController } from './controllers/api-key/api-key.controller';
 import { GithubStrategy } from './strategies/github/github.strategy';
 import { JwtAuthGuardGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { JwtOrApiKeyGuard } from './guards/jwt-or-api-key/jwt-or-api-key.guard';
+import { EmailModule } from '../email/email.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([UserEntity, BlacklistedTokenEntity, ApiKeyEntity]),
         ConfigModule,
+        EmailModule,
         PassportModule,
         JwtModule.registerAsync({
             inject: [ConfigService],

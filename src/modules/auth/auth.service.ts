@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthResponse } from './interfaces/auth-response.interface';
 import { ConfigService } from 'src/config/config/config.service';
 import { TokenBlacklistService } from './services/token-blacklist/token-blacklist.service';
+import { EmailService } from '../email/email.service';
 
 interface JwtPayload {
     sub: string;
@@ -23,6 +24,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
         private readonly tokenBlacklistService: TokenBlacklistService,
+        private readonly emailService: EmailService,
     ) { }
 
     async register(registerDto: RegisterDto): Promise<AuthResponse> {
@@ -33,6 +35,8 @@ export class AuthService {
 
         const user = this.userRepository.create(registerDto);
         const savedUser = await this.userRepository.save(user);
+
+        await this.emailService.sendWelcomeEmail(savedUser.email, savedUser.name);
 
         return this.generateAuthResponse(savedUser);
     }

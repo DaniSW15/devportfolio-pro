@@ -37,12 +37,12 @@ export class JsonFormatterService {
                 resultSize,
                 processingTime
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             const processingTime = Date.now() - startTime;
             return {
                 result: '',
                 success: false,
-                error: error.message,
+                error: error instanceof Error ? error.message : String(error),
                 originalSize: Buffer.byteLength(jsonString, 'utf-8'),
                 resultSize: 0,
                 processingTime
@@ -50,11 +50,11 @@ export class JsonFormatterService {
         }
     }
 
-    private validateJson(jsonString: string): any {
+    private validateJson(jsonString: string): unknown {
         try {
             return JSON.parse(jsonString);
-        } catch (error: any) {
-            throw new BadRequestException(`Invalid JSON: ${error.message}`);
+        } catch (error: unknown) {
+            throw new BadRequestException(`Invalid JSON: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 

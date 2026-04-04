@@ -2,11 +2,11 @@ import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Get, Query } f
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { PasswordGeneratorService } from './password-generator.service';
 import { PasswordGeneratorDto, PasswordGeneratorResponseDto } from './dto/password-generator.dto';
-import { JwtAuthGuardGuard } from 'src/modules/auth/guards/jwt-auth/jwt-auth.guard';
+import { JwtOrApiKeyGuard } from 'src/modules/auth/guards/jwt-or-api-key/jwt-or-api-key.guard';
 
 @ApiTags('Password Generator')
 @Controller('tools/password-generator')
-@UseGuards(JwtAuthGuardGuard)
+@UseGuards(JwtOrApiKeyGuard)
 @ApiBearerAuth()
 export class PasswordGeneratorController {
     constructor(private readonly passwordGeneratorService: PasswordGeneratorService) { }

@@ -1,11 +1,13 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { QrGeneratorService } from './qr-generator.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { QRGeneratorDto, QRGeneratorResponseDto } from './dto/gr-generator.dto';
 import type { Response } from 'express';
 import { QRFormat } from './interfaces/qr-error-correction.interface';
+import { JwtOrApiKeyGuard } from 'src/modules/auth/guards/jwt-or-api-key/jwt-or-api-key.guard';
 
 @ApiBearerAuth()
+@UseGuards(JwtOrApiKeyGuard)
 @Controller('qr-generator')
 export class QrGeneratorController {
     constructor(private readonly qrGeneratorService: QrGeneratorService) { }

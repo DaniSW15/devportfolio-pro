@@ -21,6 +21,7 @@ import { RateLimitModule } from './modules/rate-limit/rate-limit.module';
 import { StripeService } from './modules/billing/stripe/stripe.service';
 import { StripeModule } from './modules/billing/stripe/stripe.module';
 import { WebSocketModule } from './modules/websocket/websocket.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -81,6 +82,8 @@ import { WebSocketModule } from './modules/websocket/websocket.module';
     StripeModule,
 
     WebSocketModule,
+
+    EmailModule,
   ],
   controllers: [],
   providers: [PasswordGeneratorService, StripeService],
