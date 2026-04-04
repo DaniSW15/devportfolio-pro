@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,6 +11,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -19,10 +21,10 @@ async function bootstrap() {
   )
 
   app.enableCors({
-    origin: configService.get('cors.origin'),
-    methods: configService.get('cors.methods'),
-    allowedHeaders: configService.get('cors.allowedHeaders'),
-    credentials: configService.get('cors.credentials'),
+    origin: configService.get<string[]>('cors.allowedOrigins', ['http://localhost:3000']),
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   })
 
   const config = new DocumentBuilder()
@@ -40,11 +42,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = configService.get('port');
+  const port = configService.get<number>('PORT');
 
-  await app.listen(process.env.PORT ?? port ?? 3000);
+  await app.listen(process.env.PORT ?? port ?? 3001);
 
   console.log(`Application is running on: ${await app.getUrl()}`);
-  console.log(`Swagger docs available at: http://localhost:${port ?? 3000}/api/docs`);
+  console.log(`Swagger docs available at: http://localhost:${port ?? 3001}/api/docs`);
 }
-bootstrap();
+void bootstrap();

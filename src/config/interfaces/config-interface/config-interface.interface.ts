@@ -1,4 +1,3 @@
-// src/config/interfaces/config.interface.ts
 export interface Config {
     nodeEnv: string;
     port: number;

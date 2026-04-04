@@ -68,7 +68,7 @@ export class ConfigService {
     }
 
     getToolRateLimit(tool: string, plan: 'free' | 'premium'): number {
-        const rateLimits = this.configService.get('tools.rateLimits');
+        const rateLimits = this.configService.get<Record<string, Record<'free' | 'premium', number>>>('tools.rateLimits');
         return rateLimits?.[tool]?.[plan] || (plan === 'free' ? 100 : 1000);
     }
 

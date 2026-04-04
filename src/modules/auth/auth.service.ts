@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import type { StringValue } from 'ms';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user-entity/user.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +8,12 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthResponse } from './interfaces/auth-response.interface';
 import { ConfigService } from 'src/config/config/config.service';
 import { TokenBlacklistService } from './services/token-blacklist/token-blacklist.service';
+
+interface JwtPayload {
+    sub: string;
+    email: string;
+    role: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -25,14 +32,13 @@ export class AuthService {
         }
 
         const user = this.userRepository.create(registerDto);
-        await this.userRepository.save(user);
+        const savedUser = await this.userRepository.save(user);
 
-        return this.generateAuthResponse(user);
+        return this.generateAuthResponse(savedUser);
     }
 
     async login(loginDto: LoginDto): Promise<AuthResponse> {
-        const user = await this.userRepository.findOne({ where: { email: loginDto.email }, select: ['id', 'email', 'name', 'avatarUrl', 'role', 'password'] });
-
+        const user = await this.userRepository.findOne({ where: { email: loginDto.email }, select: ['id', 'email', 'name', 'avatarUrl', 'role', 'password', 'createdAt'] });
         if (!user || !(await user.validatePassword(loginDto.password))) {
             throw new ConflictException('Invalid email or password');
         }
@@ -47,26 +53,30 @@ export class AuthService {
         }
 
         try {
-            const payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_REFRESH_SECRET });
+            const payload = this.jwtService.verify<JwtPayload>(refreshToken, { secret: process.env.JWT_REFRESH_SECRET });
 
             const user = await this.userRepository.findOne({ where: { id: payload.sub } });
             if (!user) {
                 throw new UnauthorizedException('User not found');
             }
 
-            const access_token = this.jwtService.sign({ sub: user.id, email: user.email });
+            const { secret, expiresIn } = this.configService.jwt;
+            const access_token = this.jwtService.sign(
+                { sub: user.id, email: user.email, role: user.role },
+                { secret, expiresIn: expiresIn as StringValue },
+            );
             return { access_token };
-        } catch (error) {
+        } catch {
             throw new UnauthorizedException('Invalid refresh token');
         }
     }
 
     async logout(refresh_token: string): Promise<{ message: string }> {
         try {
-            const payload = this.jwtService.verify(refresh_token, { secret: process.env.JWT_REFRESH_SECRET });
+            const payload = this.jwtService.verify<JwtPayload>(refresh_token, { secret: process.env.JWT_REFRESH_SECRET });
             await this.tokenBlacklistService.blacklistToken(refresh_token, payload.sub);
             return { message: 'Logged out successfully' };
-        } catch (error) {
+        } catch {
             throw new UnauthorizedException('Invalid refresh token');
         }
     }
@@ -86,11 +96,11 @@ export class AuthService {
         return {
             access_token: this.jwtService.sign(payload, {
                 secret,
-                expiresIn: expiresIn as any
+                expiresIn: expiresIn as StringValue
             }),
             refresh_token: this.jwtService.sign(payload, {
                 secret: refreshSecret,
-                expiresIn: refreshExpiresIn as any
+                expiresIn: refreshExpiresIn as StringValue
             }),
             user: {
                 id: user.id,
@@ -98,7 +108,46 @@ export class AuthService {
                 name: user.name,
                 avatarUrl: user.avatarUrl,
                 role: user.role,
+                createdAt: user.createdAt,
             },
+        };
+    }
+
+    async validateOrCreateGithubUser(profile: {
+        email: string;
+        name: string;
+        avatarUrl?: string;
+    }): Promise<UserEntity> {
+        let user = await this.userRepository.findOne({
+            where: { email: profile.email },
+        });
+
+        if (!user) {
+            user = this.userRepository.create({
+                email: profile.email,
+                name: profile.name,
+                avatarUrl: profile.avatarUrl,
+                password: Math.random().toString(36), // Password aleatorio para OAuth
+            });
+            await this.userRepository.save(user);
+        }
+
+        return user;
+    }
+
+    githubLogin(user: UserEntity): { access_token: string; refresh_token: string } {
+        const payload = { sub: user.id, email: user.email, role: user.role };
+        const { secret, refreshSecret, expiresIn, refreshExpiresIn } = this.configService.jwt;
+
+        return {
+            access_token: this.jwtService.sign(payload, {
+                secret,
+                expiresIn: expiresIn as StringValue,
+            }),
+            refresh_token: this.jwtService.sign(payload, {
+                secret: refreshSecret,
+                expiresIn: refreshExpiresIn as StringValue,
+            }),
         };
     }
 }

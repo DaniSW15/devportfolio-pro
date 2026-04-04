@@ -51,11 +51,13 @@ export class ApiKeyService {
         return apiKey.user;
     }
 
-    async getUserApiKeys(userId: string): Promise<ApiKeyEntity[]> {
-        return this.apiKeyRepository.find({
+    async getUserApiKeys(userId: string): Promise<Omit<ApiKeyEntity, 'key'>[]> {
+        const keys = await this.apiKeyRepository.find({
             where: { user: { id: userId } },
+            select: ['id', 'name', 'isActive', 'usageCount', 'lastUsedAt', 'expiresAt', 'createdAt', 'updatedAt'],
             order: { createdAt: 'DESC' },
         });
+        return keys;
     }
 
     async revokeApiKey(id: string, userId: string): Promise<void> {
@@ -83,7 +85,14 @@ export class ApiKeyService {
         await this.apiKeyRepository.remove(apiKey);
     }
 
-    async getApiKeyStats(id: string, userId: string): Promise<any> {
+    async getApiKeyStats(id: string, userId: string): Promise<{
+        id: string;
+        name: string;
+        usageCount: number;
+        lastUsedAt?: Date;
+        createdAt: Date;
+        isActive: boolean;
+    }> {
         const apiKey = await this.apiKeyRepository.findOne({
             where: { id, user: { id: userId } },
         });

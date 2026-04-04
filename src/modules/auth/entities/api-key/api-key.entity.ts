@@ -24,7 +24,7 @@ export class ApiKeyEntity {
     @Column({ type: 'timestamp', nullable: true })
     expiresAt?: Date;
 
-    @ManyToOne(() => UserEntity, (user: any) => user.apiKeys)
+    @ManyToOne(() => UserEntity, (user: UserEntity) => user.apiKeys)
     user!: UserEntity;
 
     @CreateDateColumn()

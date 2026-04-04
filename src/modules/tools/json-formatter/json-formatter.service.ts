@@ -9,7 +9,7 @@ export class JsonFormatterService {
         const { jsonString, action = FormatAction.FORMAT, spaces = 2 } = dto;
 
         try {
-            const parsedJson = this.validateJson(jsonString);
+            const parsedJson = this.validateJson((jsonString));
             const originalSize = Buffer.byteLength(jsonString, 'utf-8');
             let result: string;
 

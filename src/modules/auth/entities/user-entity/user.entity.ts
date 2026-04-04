@@ -3,6 +3,7 @@ import { Exclude } from "class-transformer";
 import * as bcrypt from 'bcrypt';
 import { BeforeInsert } from "typeorm";
 import { SnippetEntity } from "src/modules/tools/snippet-manager/entity/snippet.entity";
+import { ApiKeyEntity } from "../api-key/api-key.entity";
 
 export enum UserRole {
     USER = 'user',
@@ -76,4 +77,7 @@ export class UserEntity {
 
     @OneToMany(() => SnippetEntity, (snippet) => snippet.user)
     snippets!: SnippetEntity[];
+
+    @OneToMany(() => ApiKeyEntity, (apiKey) => apiKey.user)
+    apiKeys!: ApiKeyEntity[];
 }

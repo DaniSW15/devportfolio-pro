@@ -14,6 +14,9 @@ import { ApiKeyService } from './services/api-key/api-key.service';
 import { ApiKeyEntity } from './entities/api-key/api-key.entity';
 import { ApiKeyGuard } from './guards/api-key/api-key.guard';
 import { ApiKeyController } from './controllers/api-key/api-key.controller';
+import { GithubStrategy } from './strategies/github/github.strategy';
+import { JwtAuthGuardGuard } from './guards/jwt-auth/jwt-auth.guard';
+import { JwtOrApiKeyGuard } from './guards/jwt-or-api-key/jwt-or-api-key.guard';
 
 @Module({
     imports: [
@@ -23,14 +26,14 @@ import { ApiKeyController } from './controllers/api-key/api-key.controller';
         JwtModule.registerAsync({
             inject: [ConfigService],
             imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
+            useFactory: (configService: ConfigService) => ({
                 secret: configService.get('jwt.secret'),
                 signOptions: { expiresIn: configService.get('jwt.expiresIn') },
             }),
         }),
     ],
     controllers: [AuthController, ApiKeyController],
-    providers: [AuthService, JwtStrategyService, TokenBlacklistService, ApiKeyService, ApiKeyGuard],
-    exports: [AuthService, ApiKeyService,  ApiKeyGuard, TokenBlacklistService, JwtStrategyService],
+    providers: [AuthService, JwtStrategyService, TokenBlacklistService, ApiKeyService, ApiKeyGuard, GithubStrategy, JwtAuthGuardGuard, JwtOrApiKeyGuard],
+    exports: [AuthService, ApiKeyService, ApiKeyGuard, JwtAuthGuardGuard, JwtOrApiKeyGuard, TokenBlacklistService, JwtStrategyService],
 })
 export class AuthModule { }

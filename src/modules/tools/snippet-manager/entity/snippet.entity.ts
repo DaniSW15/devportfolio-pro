@@ -24,7 +24,7 @@ export class SnippetEntity {
     @Column({ type: 'simple-array', nullable: true })
     tags?: string[];
 
-    @ManyToOne(() => UserEntity, (user: any) => user.snippets)
+    @ManyToOne(() => UserEntity, (user: UserEntity) => user.snippets)
     user!: UserEntity;
 
     @CreateDateColumn()

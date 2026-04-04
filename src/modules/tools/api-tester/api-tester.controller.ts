@@ -1,9 +1,15 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Request, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Request, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiTesterService } from './api-tester.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ApiTesterDto, ApiTesterResponseDto, CollectionDto, SaveRequestDto } from './dto/api-tester.dto';
+import { JwtOrApiKeyGuard } from 'src/modules/auth/guards/jwt-or-api-key/jwt-or-api-key.guard';
+
+interface AuthRequest extends Request {
+    user: { id: string };
+}
 
 @ApiBearerAuth()
+@UseGuards(JwtOrApiKeyGuard)
 @Controller('api-tester')
 export class ApiTesterController {
     constructor(private readonly apiTesterService: ApiTesterService) { }
@@ -24,11 +30,8 @@ export class ApiTesterController {
     @ApiResponse({ status: 200, description: 'API request configuration saved successfully' })
     @ApiResponse({ status: 400, description: 'Invalid request configuration' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    saveRequest(@Request() req, @Body() dto: SaveRequestDto): Promise<SaveRequestDto> {
-        const userId = req.user?.id;
-        if (!userId) {
-            throw new UnauthorizedException('User not authenticated');
-        }
+    saveRequest(@Request() req: AuthRequest, @Body() dto: SaveRequestDto): Promise<SaveRequestDto> {
+        const userId = req.user.id;
         return this.apiTesterService.saveRequest(userId, dto);
     }
 
@@ -37,11 +40,8 @@ export class ApiTesterController {
     @ApiOperation({ summary: 'Get the history of saved API requests' })
     @ApiResponse({ status: 200, description: 'History retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    getHistory(@Request() req): Promise<SaveRequestDto[]> {
-        const userId = req.user?.id;
-        if (!userId) {
-            throw new UnauthorizedException('User not authenticated');
-        }
+    getHistory(@Request() req: AuthRequest): Promise<SaveRequestDto[]> {
+        const userId = req.user.id;
         return this.apiTesterService.getHistory(userId);
     }
 
@@ -51,12 +51,9 @@ export class ApiTesterController {
     @ApiResponse({ status: 200, description: 'Saved API request deleted successfully' })
     @ApiResponse({ status: 404, description: 'Saved API request not found' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async deleteHistoryById(@Request() req, @Body('id') id: string) {
-        const userId = req.user?.id;
+    async deleteHistoryById(@Request() req: AuthRequest, @Body('id') id: string) {
+        const userId = req.user.id;
         const deleted = await this.apiTesterService.deleteHistoryById(userId, id);
-        if (!userId) {
-            throw new UnauthorizedException('User not authenticated');
-        }
 
         if (!deleted) {
             throw new UnauthorizedException('Saved API request not found');
@@ -70,11 +67,8 @@ export class ApiTesterController {
     @ApiResponse({ status: 200, description: 'All saved API requests deleted successfully' })
     @ApiResponse({ status: 404, description: 'Saved API request not found' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async clearHistory(@Request() req) {
-        const userId = req.user?.id;
-        if (!userId) {
-            throw new UnauthorizedException('User not authenticated');
-        }
+    async clearHistory(@Request() req: AuthRequest) {
+        const userId = req.user.id;
         await this.apiTesterService.clearHistory(userId);
         return { success: true, message: 'All saved API requests deleted successfully' };
     }
@@ -84,11 +78,8 @@ export class ApiTesterController {
     @ApiResponse({ status: 201, description: 'Collection created successfully' })
     @ApiResponse({ status: 400, description: 'Invalid collection data' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async createCollection(@Request() req, @Body() collection: CollectionDto): Promise<CollectionDto> {
-        const userId = req.user?.id;
-        if (!userId) {
-            throw new UnauthorizedException('User not authenticated');
-        }
+    async createCollection(@Request() req: AuthRequest, @Body() collection: CollectionDto): Promise<CollectionDto> {
+        const userId = req.user.id;
         return this.apiTesterService.createCollection(userId, collection);
     }
 
@@ -96,11 +87,8 @@ export class ApiTesterController {
     @ApiOperation({ summary: 'Get all collections of API requests' })
     @ApiResponse({ status: 200, description: 'Collections retrieved successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async getCollections(@Request() req): Promise<CollectionDto[]> {
-        const userId = req.user?.id;
-        if (!userId) {
-            throw new UnauthorizedException('User not authenticated');
-        }
+    async getCollections(@Request() req: AuthRequest): Promise<CollectionDto[]> {
+        const userId = req.user.id;
         return this.apiTesterService.getCollections(userId);
     }
 
