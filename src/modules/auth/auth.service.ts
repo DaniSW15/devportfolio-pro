@@ -6,9 +6,9 @@ import { Repository } from 'typeorm';
 import { LoginDto, RegisterDto } from './dto/register.dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthResponse } from './interfaces/auth-response.interface';
-import { ConfigService } from 'src/config/config/config.service';
 import { TokenBlacklistService } from './services/token-blacklist/token-blacklist.service';
 import { EmailService } from '../email/email.service';
+import { ConfigService } from 'src/config/config/config.service';
 
 interface JwtPayload {
     sub: string;

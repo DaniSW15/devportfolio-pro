@@ -2,8 +2,8 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Up
 import { Exclude } from "class-transformer";
 import * as bcrypt from 'bcrypt';
 import { BeforeInsert } from "typeorm";
-import { SnippetEntity } from "src/modules/tools/snippet-manager/entity/snippet.entity";
 import { ApiKeyEntity } from "../api-key/api-key.entity";
+import { SnippetEntity } from 'src/modules/tools/snippet-manager/entity/snippet.entity';
 
 export enum UserRole {
     USER = 'user',

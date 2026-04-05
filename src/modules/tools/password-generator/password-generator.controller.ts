@@ -1,5 +1,5 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Get, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Get } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PasswordGeneratorService } from './password-generator.service';
 import { PasswordGeneratorDto, PasswordGeneratorResponseDto } from './dto/password-generator.dto';
 import { JwtOrApiKeyGuard } from 'src/modules/auth/guards/jwt-or-api-key/jwt-or-api-key.guard';
@@ -17,7 +17,7 @@ export class PasswordGeneratorController {
     @ApiResponse({ status: 200, type: PasswordGeneratorResponseDto })
     @ApiResponse({ status: 400, description: 'Invalid parameters' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    async generatePassword(@Body() dto: PasswordGeneratorDto): Promise<PasswordGeneratorResponseDto> {
+    generatePassword(@Body() dto: PasswordGeneratorDto): PasswordGeneratorResponseDto {
         return this.passwordGeneratorService.generatePassword(dto);
     }
 
@@ -25,17 +25,17 @@ export class PasswordGeneratorController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Generate multiple passwords' })
     @ApiResponse({ status: 200, type: [PasswordGeneratorResponseDto] })
-    async generateMultiple(
+    generateMultiple(
         @Body('count') count: number,
         @Body() dto: PasswordGeneratorDto
-    ): Promise<PasswordGeneratorResponseDto[]> {
+    ): PasswordGeneratorResponseDto[] {
         return this.passwordGeneratorService.generateMultiple(count || 5, dto);
     }
 
     @Get('stats')
     @ApiOperation({ summary: 'Get tool statistics' })
     @ApiResponse({ status: 200 })
-    async getStats() {
+    getStats() {
         return this.passwordGeneratorService.getStats();
     }
 }

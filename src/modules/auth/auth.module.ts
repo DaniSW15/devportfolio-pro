@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from 'src/config/config/config.service';
 import { JwtModule } from '@nestjs/jwt';
+import type { StringValue } from 'ms';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth.service';
 import { JwtStrategyService } from './strategies/jwt-strategy/jwt.strategy.service';
@@ -29,8 +30,8 @@ import { EmailModule } from '../email/email.module';
             inject: [ConfigService],
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
-                secret: configService.get('jwt.secret'),
-                signOptions: { expiresIn: configService.get('jwt.expiresIn') },
+                secret: configService.get<string>('jwt.secret'),
+                signOptions: { expiresIn: configService.get<string>('jwt.expiresIn') as StringValue },
             }),
         }),
     ],

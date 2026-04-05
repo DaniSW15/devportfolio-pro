@@ -50,7 +50,7 @@ export class PasswordGeneratorService {
         }
 
         // Asegurar que contiene al menos un carácter de cada tipo seleccionado
-        password = this.ensureAllTypes(password, uppercase, lowercase, numbers, symbols, charset);
+        password = this.ensureAllTypes(password, uppercase, lowercase, numbers, symbols);
 
         const strength = this.calculateStrength(password);
         const entropy = this.calculateEntropy(password, charsetLength);
@@ -68,11 +68,10 @@ export class PasswordGeneratorService {
         uppercase: boolean,
         lowercase: boolean,
         numbers: boolean,
-        symbols: boolean,
-        charset: string
+        symbols: boolean
     ): string {
         let result = password;
-        const types: any = [];
+        const types: { regex: RegExp; chars: string }[] = [];
 
         if (uppercase) types.push({ regex: /[A-Z]/, chars: this.ALL_CHARS.uppercase });
         if (lowercase) types.push({ regex: /[a-z]/, chars: this.ALL_CHARS.lowercase });
@@ -128,7 +127,7 @@ export class PasswordGeneratorService {
         return Math.log2(Math.pow(charsetSize, password.length));
     }
 
-    async generateMultiple(count: number, dto: PasswordGeneratorDto): Promise<PasswordGeneratorResponseDto[]> {
+    generateMultiple(count: number, dto: PasswordGeneratorDto): PasswordGeneratorResponseDto[] {
         if (count < 1 || count > 50) {
             throw new BadRequestException('Count must be between 1 and 50');
         }
@@ -140,7 +139,7 @@ export class PasswordGeneratorService {
         return passwords;
     }
 
-    async getStats() {
+    getStats() {
         return {
             tool: 'password-generator',
             version: '1.0.0',
